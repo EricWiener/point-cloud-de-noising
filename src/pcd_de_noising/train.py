@@ -14,7 +14,7 @@ DATASET_PATH = (
 )
 
 
-def train(num_epochs, cuda):
+def train(num_epochs, cuda, save_path):
 
     use_cuda = cuda and torch.cuda.is_available()
     print(f"Using CUDA: {use_cuda}")
@@ -65,14 +65,40 @@ def train(num_epochs, cuda):
 
         average_epoch_loss = mean(epoch_losses)
         average_epoch_losses.append(average_epoch_loss)
-        print(f"[{epoch + 1}/{num_epochs}] average loss: {average_epoch_loss}")
+        print(
+            f"[{epoch + 1}/{num_epochs}]",
+            f"average loss: {average_epoch_loss:.3f}"
+        )
 
     print("Finished training")
 
+    torch.save({
+        "epoch": num_epochs + 1,
+        "state_dict": net.state_dict(),
+        "optimizer": optimizer.state_dict()
+    }, save_path)
+
+    print(f"Saved model to {save_path}")
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='PyTorch Implementation of Point Cloud Denoising')
-    parser.add_argument('--epochs', type=int, default=20, help='Number of epochs (default: 20)')
-    parser.add_argument('--cuda', action='store_true', help='Use CUDA (default: false)')
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--epochs",
+        type=int,
+        default=20,
+        help="Number of epochs (default: 20)"
+    )
+    parser.add_argument(
+        "--cuda",
+        action="store_true",
+        help="Use CUDA (default: false)"
+    )
+    parser.add_argument(
+        "--path",
+        type=str,
+        default="./model.pickle",
+        help="Path to save model (default: './model.pickle')"
+    )
     args = parser.parse_args()
-    train(num_epochs=args.epochs, cuda=args.cuda)
+    train(num_epochs=args.epochs, cuda=args.cuda, save_path=args.path)
