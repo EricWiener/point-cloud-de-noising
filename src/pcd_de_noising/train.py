@@ -12,7 +12,7 @@ DATASET_PATH = (
 )
 
 
-def train(cuda=False):
+def train(num_epochs, cuda):
 
     use_cuda = cuda and torch.cuda.is_available()
     print(f"Using CUDA: {use_cuda}")
@@ -26,7 +26,7 @@ def train(cuda=False):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), betas=(0.9, 0.999), eps=1e-8)
 
-    for epoch in range(2):  # loop over the dataset multiple times
+    for epoch in range(num_epochs):
 
         running_loss = 0.0
         for i, (distance, reflectivity, labels) in enumerate(loader):
@@ -51,7 +51,9 @@ def train(cuda=False):
             # print statistics
             running_loss += loss.item()
             if i % 2 == 0:  # print every 2 mini-batches
-                print("[%d, %5d] loss: %.3f" % (epoch + 1, i + 1, running_loss / 2))
+                print(f"[{epoch + 1}/{num_epochs}, {(i + 1):5}/{len(loader)}]",
+                      f"loss: {(running_loss / 2):.3f}"
+                )
                 running_loss = 0.0
 
     print("Finished training")
@@ -59,6 +61,7 @@ def train(cuda=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='PyTorch Implementation of DeepCluster')
+    parser.add_argument('--epochs', type=int, default=20, help='Number of epochs (default: 20)')
     parser.add_argument('--cuda', action='store_true', help='Use CUDA (default: false)')
     args = parser.parse_args()
-    train(cuda=args.cuda)
+    train(num_epochs=args.epochs, cuda=args.cuda)

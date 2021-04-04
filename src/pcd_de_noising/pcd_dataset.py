@@ -9,7 +9,7 @@ LABEL_KEY = "labels_1"
 
 
 class PCDDataset(Dataset):
-    """HDF5 PyTorch Dataset to load distance, intensity, and labels from the PCD dataset.
+    """HDF5 PyTorch Dataset to load distance, reflectivity, and labels from the PCD dataset.
 
     Input params:
         file_path: Path to the folder containing the dataset (1+ HDF5 files).
@@ -39,12 +39,13 @@ class PCDDataset(Dataset):
         reflectivity = data[1:, :, :]  # 1 x 32 x 400
 
         label = torch.from_numpy(label).long()  # 32 x 400
-        # From the author: "We used the following label mapping for a single lidar point:
+        # From the author: "We used the following label mapping for a point:
         #   0: no label, 100: valid/clear, 101: rain, 102: fog"
         # We will map these labels to the range [0, 3], where:
         #   0: no label, 1: valid/clear, 2: rain, 3: fog
         # TODO: Discard 0s? Not going to learn anything useful from them
-        #   Might even teach the model that adverse weather isn't adverse weather because it's unlabeled
+        #   Might teach the model that adverse weather isn't adverse weather,
+        #   because it's labeled as nothing
         label = torch.where(label == 0, torch.tensor(99), label)
         label -= 99
 
