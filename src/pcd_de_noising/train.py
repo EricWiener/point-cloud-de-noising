@@ -1,10 +1,12 @@
 import argparse
+from statistics import mean
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import DataLoader
+
 from model.weathernet import WeatherNet
 from pcd_dataset import PCDDataset
-from torch.utils.data import DataLoader
 
 # DATASET_PATH = "/Users/ericwiener/repositories/point-cloud-de-noising/data"
 DATASET_PATH = (
@@ -26,8 +28,11 @@ def train(num_epochs, cuda):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), betas=(0.9, 0.999), eps=1e-8)
 
+    average_epoch_losses = []
+
     for epoch in range(num_epochs):
 
+        epoch_losses = []
         running_loss = 0.0
         for i, (distance, reflectivity, labels) in enumerate(loader):
 
@@ -43,24 +48,30 @@ def train(num_epochs, cuda):
             # outputs is [B, 4 (num classes), 32, 400]
             outputs = net(distance, reflectivity)
 
-            # Labels is [B, 32, 400]
+            # labels is [B, 32, 400]
             loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
             # print statistics
+            epoch_losses.append(loss.item())
             running_loss += loss.item()
             if i % 2 == 0:  # print every 2 mini-batches
-                print(f"[{epoch + 1}/{num_epochs}, {(i + 1):5}/{len(loader)}]",
-                      f"loss: {(running_loss / 2):.3f}"
+                print(
+                    f"[{epoch + 1}/{num_epochs}, {(i + 1):5}/{len(loader)}]",
+                    f"loss: {(running_loss / 2):.3f}"
                 )
                 running_loss = 0.0
+
+        average_epoch_loss = mean(epoch_losses)
+        average_epoch_losses.append(average_epoch_loss)
+        print(f"[{epoch + 1}/{num_epochs}] average loss: {average_epoch_loss}")
 
     print("Finished training")
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='PyTorch Implementation of DeepCluster')
+    parser = argparse.ArgumentParser(description='PyTorch Implementation of Point Cloud Denoising')
     parser.add_argument('--epochs', type=int, default=20, help='Number of epochs (default: 20)')
     parser.add_argument('--cuda', action='store_true', help='Use CUDA (default: false)')
     args = parser.parse_args()
