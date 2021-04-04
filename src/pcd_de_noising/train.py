@@ -1,3 +1,5 @@
+import argparse
+import torch
 import torch.nn as nn
 import torch.optim as optim
 from model.weathernet import WeatherNet
@@ -10,12 +12,17 @@ DATASET_PATH = (
 )
 
 
-def main():
+def train(cuda=False):
+
+    use_cuda = cuda and torch.cuda.is_available()
+    print(f"Using CUDA: {use_cuda}")
+
     dataset = PCDDataset(DATASET_PATH, recursive=True)
     print(f"Found {len(dataset)} files")
 
-    loader = DataLoader(dataset, batch_size=256, shuffle=True, num_workers=4)
+    loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=2)
     net = WeatherNet(num_classes=4)  # No label (0), clear (1), rain (2), fog (3)
+    if use_cuda: net = net.cuda()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), betas=(0.9, 0.999), eps=1e-8)
 
@@ -23,6 +30,11 @@ def main():
 
         running_loss = 0.0
         for i, (distance, reflectivity, labels) in enumerate(loader):
+
+            if use_cuda:
+                distance = distance.cuda()
+                reflectivity = reflectivity.cuda()
+                labels = labels.cuda()
 
             # zero the parameter gradients
             optimizer.zero_grad()
@@ -46,4 +58,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description='PyTorch Implementation of DeepCluster')
+    parser.add_argument('--cuda', action='store_true', help='Use CUDA (default: false)')
+    args = parser.parse_args()
+    train(cuda=args.cuda)
