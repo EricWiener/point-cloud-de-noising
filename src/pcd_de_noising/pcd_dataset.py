@@ -2,7 +2,8 @@ from pathlib import Path
 
 import h5py
 import torch
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
+from pytorch_lightning import LightningDataModule
 
 DATA_KEYS = ["distance_m_1", "intensity_1"]
 LABEL_KEY = "labels_1"
@@ -60,3 +61,30 @@ class PCDDataset(Dataset):
 
     def __len__(self):
         return len(self.files)
+
+
+class PointCloudDataModule(LightningDataModule):
+    def __init__(self, train_directory, val_directory):
+        """Create a PointCloudDataModule
+
+        Args:
+            train_directory (str): path to the training hdf5 files
+            val_directory (str): path to the validation hdf5 files
+        """
+        super().__init__()
+        self.train_directory = train_directory
+        self.val_directory = val_directory
+
+    def train_dataloader(self):
+        dataset = PCDDataset(self.train_directory, recursive=True)
+        print(f"Train found {len(dataset)} files")
+
+        loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=2)
+        return loader
+
+    def val_dataloader(self):
+        dataset = PCDDataset(self.val_directory, recursive=True)
+        print(f"Val found {len(dataset)} files")
+
+        loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=2)
+        return loader

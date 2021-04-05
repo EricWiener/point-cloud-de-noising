@@ -16,4 +16,4 @@ finally:
     del version, PackageNotFoundError
 
 from .model import WeatherNet
-from .pcd_dataset import PCDDataset
+from .pcd_dataset import PCDDataset, PointCloudDataModule
