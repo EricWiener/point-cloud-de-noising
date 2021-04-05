@@ -1,12 +1,12 @@
 import argparse
 from statistics import mean
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
-
 from model.weathernet import WeatherNet
 from pcd_dataset import PCDDataset
+from torch.utils.data import DataLoader
 
 # DATASET_PATH = "/Users/ericwiener/repositories/point-cloud-de-noising/data"
 DATASET_PATH = (
@@ -24,7 +24,8 @@ def train(num_epochs, cuda, save_path):
 
     loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=2)
     net = WeatherNet(num_classes=4)  # No label (0), clear (1), rain (2), fog (3)
-    if use_cuda: net = net.cuda()
+    if use_cuda:
+        net = net.cuda()
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(net.parameters(), betas=(0.9, 0.999), eps=1e-8)
 
@@ -59,24 +60,24 @@ def train(num_epochs, cuda, save_path):
             if i % 2 == 0:  # print every 2 mini-batches
                 print(
                     f"[{epoch + 1}/{num_epochs}, {(i + 1):5}/{len(loader)}]",
-                    f"loss: {(running_loss / 2):.3f}"
+                    f"loss: {(running_loss / 2):.3f}",
                 )
                 running_loss = 0.0
 
         average_epoch_loss = mean(epoch_losses)
         average_epoch_losses.append(average_epoch_loss)
-        print(
-            f"[{epoch + 1}/{num_epochs}]",
-            f"average loss: {average_epoch_loss:.3f}"
-        )
+        print(f"[{epoch + 1}/{num_epochs}]", f"average loss: {average_epoch_loss:.3f}")
 
     print("Finished training")
 
-    torch.save({
-        "epoch": num_epochs + 1,
-        "state_dict": net.state_dict(),
-        "optimizer": optimizer.state_dict()
-    }, save_path)
+    torch.save(
+        {
+            "epoch": num_epochs + 1,
+            "state_dict": net.state_dict(),
+            "optimizer": optimizer.state_dict(),
+        },
+        save_path,
+    )
 
     print(f"Saved model to {save_path}")
 
@@ -84,21 +85,14 @@ def train(num_epochs, cuda, save_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--epochs",
-        type=int,
-        default=20,
-        help="Number of epochs (default: 20)"
+        "--epochs", type=int, default=20, help="Number of epochs (default: 20)"
     )
-    parser.add_argument(
-        "--cuda",
-        action="store_true",
-        help="Use CUDA (default: false)"
-    )
+    parser.add_argument("--cuda", action="store_true", help="Use CUDA (default: false)")
     parser.add_argument(
         "--path",
         type=str,
         default="./model.pickle",
-        help="Path to save model (default: './model.pickle')"
+        help="Path to save model (default: './model.pickle')",
     )
     args = parser.parse_args()
     train(num_epochs=args.epochs, cuda=args.cuda, save_path=args.path)
