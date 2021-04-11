@@ -25,7 +25,7 @@ Create an environment
 Before you start coding we recommend to install Miniconda_ which allows
 to setup a dedicated development environment named ``pcd-de-noising`` with::
 
-   conda create -n pcd-de-noising python=3
+   conda create -n pcd-de-noising python=3 h5py
 
 Then activate the environment ``pcd-de-noising`` with::
 
