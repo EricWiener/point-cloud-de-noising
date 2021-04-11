@@ -1,0 +1,11 @@
+[general]
+contrib=contrib-title-conventional-commits
+
+
+[contrib-title-conventional-commits]
+# Specify allowed commit types. For details see: https://www.conventionalcommits.org/
+types = FEAT, FIX, REFACTOR, TEST, STYLE, DOCS, CHORE, BUILD, RELEASE
+
+# Ensure the title doesn't contain certain words
+[title-must-not-contain-word]
+words=stuff, think, broken
