@@ -1,7 +1,6 @@
-import pytest
+import torch
 
 from pcd_de_noising.model import WeatherNet
-import torch
 
 
 def test_weathernet_size_check():

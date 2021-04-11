@@ -1,7 +1,6 @@
-import pytest
+import torch
 
 from pcd_de_noising.model.lilanet import LiLaNet
-import torch
 
 
 def test_lilanet_size_check():

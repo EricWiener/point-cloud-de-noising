@@ -1,9 +1,7 @@
 import pytorch_lightning as pl
 import torch
-import torch.hub as hub
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics import F1, HammingDistance
 
 from .lilanet import LiLaBlock
 

@@ -7,7 +7,7 @@ from .padding import conv2d_get_padding
 
 pretrained_models = {
     "kitti": {
-        "url": "https://github.com/TheCodez/pytorch-LiLaNet/releases/download/0.1/lilanet_45.5-75c06618.pth",
+        "url": "https://github.com/TheCodez/pytorch-LiLaNet/releases/download/0.1/lilanet_45.5-75c06618.pth",  # noqa
         "num_classes": 4,
     }
 }
@@ -17,9 +17,10 @@ def lilanet(pretrained=None, num_classes=13):
     """Constructs a LiLaNet model.
 
     Args:
-        pretrained (string): If not ``None``, returns a pre-trained model. Possible values: ``kitti``.
-        num_classes (int): number of output classes. Automatically set to the correct number of classes
-            if ``pretrained`` is specified.
+        pretrained (string): If not ``None``, returns a pre-trained model.
+            Possible values: ``kitti``.
+        num_classes (int): number of output classes. Automatically set to the
+            correct number of classes if ``pretrained`` is specified.
     """
     if pretrained is not None:
         model = LiLaNet(pretrained_models[pretrained]["num_classes"])

@@ -2,8 +2,8 @@ from pathlib import Path
 
 import h5py
 import torch
-from torch.utils.data import Dataset, DataLoader
 from pytorch_lightning import LightningDataModule
+from torch.utils.data import DataLoader, Dataset
 
 DATA_KEYS = ["distance_m_1", "intensity_1"]
 LABEL_KEY = "labels_1"

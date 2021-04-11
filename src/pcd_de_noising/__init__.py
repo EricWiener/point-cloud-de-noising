@@ -17,3 +17,6 @@ finally:
 
 from .model import WeatherNet
 from .pcd_dataset import PCDDataset, PointCloudDataModule
+
+# make pep8 happy. src: https://stackoverflow.com/a/31079085/6942666
+__all__ = ["WeatherNet", "PCDDataset", "PointCloudDataModule"]
