@@ -64,7 +64,7 @@ class PCDDataset(Dataset):
 
 
 class PointCloudDataModule(LightningDataModule):
-    def __init__(self, train_directory, val_directory):
+    def __init__(self, train_directory, val_directory, test_directory):
         """Create a PointCloudDataModule
 
         Args:
@@ -74,6 +74,7 @@ class PointCloudDataModule(LightningDataModule):
         super().__init__()
         self.train_directory = train_directory
         self.val_directory = val_directory
+        self.test_directory = test_directory
 
     def train_dataloader(self):
         dataset = PCDDataset(self.train_directory, recursive=True)
@@ -86,5 +87,12 @@ class PointCloudDataModule(LightningDataModule):
         dataset = PCDDataset(self.val_directory, recursive=True)
         print(f"Val found {len(dataset)} files")
 
-        loader = DataLoader(dataset, batch_size=4, shuffle=True, num_workers=2)
+        loader = DataLoader(dataset, batch_size=4, num_workers=2)
+        return loader
+
+    def test_dataloader(self):
+        dataset = PCDDataset(self.test_directory, recursive=True)
+        print(f"Test found {len(dataset)} files")
+
+        loader = DataLoader(dataset, batch_size=4, num_workers=2)
         return loader

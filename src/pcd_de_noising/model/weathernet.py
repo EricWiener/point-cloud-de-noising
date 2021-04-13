@@ -2,6 +2,7 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from pytorch_lightning.metrics.functional import accuracy, average_precision
 
 from .lilanet import LiLaBlock
 
@@ -121,6 +122,13 @@ class WeatherNet(pl.LightningModule):
 
         # self.val_hamming(logits, labels)
         # self.log("val_hamming", self.val_hamming, on_step=False, on_epoch=True)
+
+    def test_step(self, batch, batch_idx):
+        distance, reflectivity, labels = batch
+        loss, logits, predictions = self.shared_step(distance, reflectivity, labels)
+
+        self.log("test_acc", accuracy(predictions, labels))
+        self.log("test_ap", average_precision(predictions, labels))
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), betas=(0.9, 0.999), eps=1e-8)
